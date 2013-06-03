@@ -28,67 +28,82 @@ or install it manually
 sudo gem install differ
 ```
 
-## Usage
+## How do I use this thing?
 
-There are a number of ways to use Differ, depending on your situation and needs.
+There are a number of ways to use Differ, depending on your situation and needs. Lets examplify:
 
 ```ruby
+require 'differ'
+
 @original = "Epic lolcat fail!"
 @current  = "Epic wolfman fail!"
 ```
 
-You can call the Differ module directly.
-
-```ruby
-require 'differ'
-```
-
-There are a number of built-in diff methods to choose from...
+There are a number of built-in diff_by_* methods to choose from for standard use:
 
 ```ruby
 @diff = Differ.diff_by_line(@current, @original)
-# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
 @diff = Differ.diff_by_word(@current, @original)
-# => "Epic {"lolcat" >> "wolfman"} fail!"
+# => Epic {"lolcat" >> "wolfman"} fail!
 
 @diff = Differ.diff_by_char(@current, @original)
-# => "Epic {+"wo"}l{-"olcat "}f{+"m"}a{+"n fa"}il!"
+# => Epic {+"wo"}l{-"olcat "}f{+"m"}a{+"n fa"}il!
 ```
 
-... or call #diff directly and supply your own boundary string!
+### Ok, but that doesn't quite cover my case, I have to split by "whatever".
+
+No problem, you can call diff directly and supply your own boundary string:
 
 ```ruby
 @diff = Differ.diff(@current, @original)  # implicitly by line!
-# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
 @diff = Differ.diff(@current, @original, 'i')
-# => "Epi{"c lolcat fa" >> "c wolfman fa"}il"
+# => Epi{"c lolcat fa" >> "c wolfman fa"}il
 ```
 
-If you would like something a little more inline...
+### Yeah, thats nice. But a simple string might not always cut it...
+
+Well, you can supply a regex instead of your string if you have to:
 
 ```ruby
-require 'differ/string'
+Differ.diff(@original, @current, /[a-z]i/
+# => E{"c wolfman f" >> "c lolcat f"}l!
+```
 
+### Ok, ok, but I don't like having to write "Differ" everywhere.
+
+If you would like something a little more inline you can `require 'differ/string'` to get some added inline string magic:
+
+```ruby
 @diff = @current.diff(@original)  # implicitly by line!
-# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 ```
 
-... or a lot more inline...
+Or a lot more inline:
 
 ```ruby
-@diff = (@current - @original)    # implicitly by line!
-# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+diff = (@current - @original)    # implicitly by line!
+# => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
-Differ.separator = ' '
-@diff = (@current - @original)
-# => "Epic {"lolcat" >> "wolfman"} fail!"
+Differ.separator = ' ' # <- Custom string
+diff = (@current - @original)
+# => Epic {"lolcat" >> "wolfman"} fail!
+
+Differ.separator = /[a-z]i/ # <- Custom regex without capture group
+diff =  @original - @current
+=> E{"c wolfman f" >> "c lolcat f"}l!
+
+Differ.separator = /([a-z]i)/ # <- Custom regex with capture group
+diff =  @original - @current
+=> Epi{"c wolfman f" >> "c lolcat f"}ail!
 ```
 
-... we've pretty much got you covered.
+So we've pretty much got you covered.
 
-### Output Formatting
+## Waht about output formatting?
 
 Need a different output format?  We've got a few of those too.
 
@@ -100,8 +115,9 @@ Differ.format = :html
 Differ.format = MyCustomFormatModule
 ```
 
-Don't want to change the system-wide default for only a single diff output?
-Yeah, me either.
+### But I don't want to change the system-wide default for only a single diff output!
+
+Yeah, we either:
 
 ```ruby
 @diff = (@current - @original)

@@ -30,8 +30,8 @@ describe Differ do
   describe '#format_for' do
     before(:each) { Differ.format = nil }
 
-    it 'should store any module passed to it' do
-      formatter = Module.new
+    it 'should store any callable passed to it' do
+      formatter = ->(c){ c.to_s }
       Differ.format_for(formatter).should == formatter
     end
 

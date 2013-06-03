@@ -110,25 +110,34 @@ Differ.separator = /([a-z]i)/ # Custom regex with capture group
 
 So we've pretty much got you covered.
 
-## Waht about output formatting?
+## What about output formatting?
 
-Need a different output format?  We've got a few of those too.
+Need a different output format?  We've got a few of those too:
 
 ```ruby
-Differ.format = :ascii  # <- Default
+Differ.format = :ascii  # Default
 Differ.format = :color
 Differ.format = :html
 
 Differ.format = MyCustomFormatModule
 ```
 
+The formatter must respond to the call method that takes an instant of the Change class as an argument and returns a string.
+
 ### But I don't want to change the system-wide default for only a single diff output!
 
 Yeah, we either:
 
 ```ruby
-@diff = (@current - @original)
-@diff.format_as(:color)
+diff = @current - @original
+diff.format_as(:color)
+```
+
+Or with your own formatter:
+
+```ruby
+diff = @current - @original
+diff.format_as(->(c){c.to_s})
 ```
 
 ## Copyright

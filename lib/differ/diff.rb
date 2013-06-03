@@ -76,7 +76,7 @@ module Differ
       @raw.inject('') do |sum, part|
         part = case part
         when String then part
-        when Change then f.format(part)
+        when Change then f.call(part)
         end
         sum << part
       end

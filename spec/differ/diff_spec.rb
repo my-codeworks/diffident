@@ -22,7 +22,7 @@ describe Differ::Diff do
 
     it 'should delegate insertion changes to Differ#format' do
       i = +'b'
-      @format.should_receive(:format).once.with(i).and_return('!')
+      @format.should_receive(:call).once.with(i).and_return('!')
       diff('a', i, 'c').to_s.should == 'a!c'
     end
   end
@@ -30,12 +30,12 @@ describe Differ::Diff do
   describe '#format_as' do
     before(:each) do
       @change = +'b'
-      Differ.format = Module.new { def self.format(c); raise :error; end }
-      @format = Module.new { def self.format(c); end }
+      Differ.format = Module.new { def self.call(c); raise :error; end }
+      @format = Module.new { def self.call(c); end }
     end
 
     it 'should delegate change formatting to the given format' do
-      @format.should_receive(:format).once.with(@change).and_return('!')
+      @format.should_receive(:call).once.with(@change).and_return('!')
       diff('a', @change, 'c').format_as(@format).should == 'a!c'
     end
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Differ::Change do
   before(:each) do
-    @format = Module.new { def self.format(c); end }
+    @format = Module.new { def self.call(c); end }
     Differ.format = @format
   end
 
@@ -20,7 +20,7 @@ describe Differ::Change do
     end
 
     it 'should stringify to ""' do
-      @format.should_receive(:format).once.and_return('')
+      @format.should_receive(:call).once.and_return('')
       @change.to_s.should == ''
     end
   end
@@ -76,7 +76,7 @@ describe Differ::Change do
   end
 
   it "should stringify via the current format's #format method" do
-    @format.should_receive(:format).once
+    @format.should_receive(:call).once
     Differ::Change.new.to_s
   end
 end

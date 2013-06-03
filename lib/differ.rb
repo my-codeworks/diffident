@@ -53,13 +53,16 @@ module Differ
     end
 
     def format_for(f)
-      case f
-      when Module then f
-      when :ascii then Format::Ascii
-      when :color then Format::Color
-      when :html  then Format::HTML
-      when nil    then nil
-      else raise "Unknown format type #{f.inspect}"
+      if f.respond_to? :call
+        f
+      else       
+        case f
+        when :ascii then Format::Ascii
+        when :color then Format::Color
+        when :html  then Format::HTML
+        when nil    then nil
+        else raise "Unknown format type #{f.inspect}"
+        end
       end
     end
 

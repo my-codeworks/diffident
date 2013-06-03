@@ -57,7 +57,7 @@ Differ.diff_by_char(@current, @original)
 No problem, you can call diff directly and supply your own boundary string:
 
 ```ruby
-Differ.diff(@current, @original)  # implicitly by line!
+Differ.diff(@current, @original) # Implicitly by line by default
 # => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
 Differ.diff(@current, @original, 'i')
@@ -69,8 +69,15 @@ Differ.diff(@current, @original, 'i')
 Well, you can supply a regex instead of your string if you have to:
 
 ```ruby
-Differ.diff(@original, @current, /[a-z]i/
+Differ.diff(@original, @current, /[a-z]i/)
 # => E{"c wolfman f" >> "c lolcat f"}l!
+```
+
+Include a capture group if you want to keep the separator:
+
+```ruby
+Differ.diff(@original, @current, /([a-z]i)/)
+# => Epi{"c wolfman f" >> "c lolcat f"}ail!
 ```
 
 ### Ok, ok, but I don't like having to write "Differ" everywhere.

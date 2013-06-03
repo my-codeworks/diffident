@@ -10,6 +10,20 @@ ones are built-in), and can be output in a variety of formats.
 
 ## Installation
 
+Add this to your gemfile if you use bundler
+
+```ruby
+gem 'differ'
+```
+
+and bundle to install
+
+```bash
+bundle install
+```
+
+or install it manually
+
 ```bash
 sudo gem install differ
 ```

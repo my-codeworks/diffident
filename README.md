@@ -14,7 +14,7 @@ ones are built-in), and can be output in a variety of formats.
 sudo gem install differ
 ```
 
-== Usage
+## Usage
 
 There are a number of ways to use Differ, depending on your situation and needs.
 
@@ -33,23 +33,23 @@ There are a number of built-in diff methods to choose from...
 
 ```ruby
 @diff = Differ.diff_by_line(@current, @original)
-  # => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
 
 @diff = Differ.diff_by_word(@current, @original)
-  # => "Epic {"lolcat" >> "wolfman"} fail!"
+# => "Epic {"lolcat" >> "wolfman"} fail!"
 
 @diff = Differ.diff_by_char(@current, @original)
-  # => "Epic {+"wo"}l{-"olcat "}f{+"m"}a{+"n fa"}il!"
+# => "Epic {+"wo"}l{-"olcat "}f{+"m"}a{+"n fa"}il!"
 ```
 
 ... or call #diff directly and supply your own boundary string!
 
 ```ruby
 @diff = Differ.diff(@current, @original)  # implicitly by line!
-  # => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
 
 @diff = Differ.diff(@current, @original, 'i')
-  # => "Epi{"c lolcat fa" >> "c wolfman fa"}il"
+# => "Epi{"c lolcat fa" >> "c wolfman fa"}il"
 ```
 
 If you would like something a little more inline...
@@ -58,18 +58,18 @@ If you would like something a little more inline...
 require 'differ/string'
 
 @diff = @current.diff(@original)  # implicitly by line!
-  # => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
 ```
 
 ... or a lot more inline...
 
 ```ruby
 @diff = (@current - @original)    # implicitly by line!
-  # => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
+# => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
 
 Differ.separator = ' '
 @diff = (@current - @original)
-  # => "Epic {"lolcat" >> "wolfman"} fail!"
+# => "Epic {"lolcat" >> "wolfman"} fail!"
 ```
 
 ... we've pretty much got you covered.

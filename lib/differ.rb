@@ -7,20 +7,29 @@ require 'differ/format/html'
 module Differ
   class << self
 
-    def diff(target, source, separator = "\n")
-      old_sep, $; = $;, separator
+    def separator=(separator)
+      @@separator = separator
+    end
 
-      target = target.split(separator)
-      source = source.split(separator)
+    def separator
+      @@separator
+    end    
 
-      $; = '' if separator.is_a? Regexp
+    def diff(target, source, new_sep = "\n")
+      old_sep = self.separator
+      self.separator = new_sep
+
+      target = target.split(new_sep)
+      source = source.split(new_sep)
+
+      self.separator = '' if new_sep.is_a? Regexp
 
       @diff = Diff.new
       advance(target, source) until source.empty? || target.empty?
       @diff.insert(*target) || @diff.delete(*source)
       return @diff
     ensure
-      $; = old_sep
+      self.separator = old_sep
     end
 
     def diff_by_char(to, from)

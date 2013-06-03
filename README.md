@@ -72,7 +72,7 @@ require 'differ/string'
 @diff = (@current - @original)    # implicitly by line!
   # => "{"Epic lolcat fail!" >> "Epic wolfman fail!"}"
 
-$; = ' '
+Differ.separator = ' '
 @diff = (@current - @original)
   # => "Epic {"lolcat" >> "wolfman"} fail!"
 ```

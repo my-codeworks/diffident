@@ -89,7 +89,7 @@ module Differ
 
   private
     def sep
-      "#{$;}"
+      "#{Differ.separator}"
     end
   end
 end

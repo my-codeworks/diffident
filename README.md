@@ -42,13 +42,13 @@ require 'differ'
 There are a number of built-in diff_by_* methods to choose from for standard use:
 
 ```ruby
-@diff = Differ.diff_by_line(@current, @original)
+Differ.diff_by_line(@current, @original)
 # => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
-@diff = Differ.diff_by_word(@current, @original)
+Differ.diff_by_word(@current, @original)
 # => Epic {"lolcat" >> "wolfman"} fail!
 
-@diff = Differ.diff_by_char(@current, @original)
+Differ.diff_by_char(@current, @original)
 # => Epic {+"wo"}l{-"olcat "}f{+"m"}a{+"n fa"}il!
 ```
 
@@ -57,10 +57,10 @@ There are a number of built-in diff_by_* methods to choose from for standard use
 No problem, you can call diff directly and supply your own boundary string:
 
 ```ruby
-@diff = Differ.diff(@current, @original)  # implicitly by line!
+Differ.diff(@current, @original)  # implicitly by line!
 # => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
-@diff = Differ.diff(@current, @original, 'i')
+Differ.diff(@current, @original, 'i')
 # => Epi{"c lolcat fa" >> "c wolfman fa"}il
 ```
 
@@ -78,27 +78,27 @@ Differ.diff(@original, @current, /[a-z]i/
 If you would like something a little more inline you can `require 'differ/string'` to get some added inline string magic:
 
 ```ruby
-@diff = @current.diff(@original)  # implicitly by line!
+@current.diff(@original) # Implicitly by line by default
 # => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 ```
 
 Or a lot more inline:
 
 ```ruby
-diff = (@current - @original)    # implicitly by line!
+@current - @original # Implicitly by line by default
 # => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
-Differ.separator = ' ' # <- Custom string
-diff = (@current - @original)
+Differ.separator = ' ' # Custom string
+@current - @original
 # => Epic {"lolcat" >> "wolfman"} fail!
 
-Differ.separator = /[a-z]i/ # <- Custom regex without capture group
-diff =  @original - @current
-=> E{"c wolfman f" >> "c lolcat f"}l!
+Differ.separator = /[a-z]i/ # Custom regex without capture group
+@original - @current
+# => E{"c wolfman f" >> "c lolcat f"}l!
 
-Differ.separator = /([a-z]i)/ # <- Custom regex with capture group
-diff =  @original - @current
-=> Epi{"c wolfman f" >> "c lolcat f"}ail!
+Differ.separator = /([a-z]i)/ # Custom regex with capture group
+@original - @current
+# => Epi{"c wolfman f" >> "c lolcat f"}ail!
 ```
 
 So we've pretty much got you covered.

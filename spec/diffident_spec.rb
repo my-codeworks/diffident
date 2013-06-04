@@ -1,68 +1,68 @@
 require 'spec_helper'
 
-describe Differ do
+describe Diffident do
   describe '#format' do
-    before(:each) { Differ.format = nil }
+    before(:each) { Diffident.format = nil }
 
     it 'should return the last value it was set to' do
-      Differ.format = Differ::Format::HTML
-      Differ.format.should == Differ::Format::HTML
+      Diffident.format = Diffident::Format::HTML
+      Diffident.format.should == Diffident::Format::HTML
     end
 
-    it 'should default to Differ::Format::Ascii' do
-      Differ.format.should == Differ::Format::Ascii
+    it 'should default to Diffident::Format::Ascii' do
+      Diffident.format.should == Diffident::Format::Ascii
     end
   end
 
   describe '#format=' do
     it 'should call #format_for with the passed argument' do
-      Differ.should_receive(:format_for).with(:format).once
-      Differ.format = :format
+      Diffident.should_receive(:format_for).with(:format).once
+      Diffident.format = :format
     end
 
     it 'should raise an error on undefined behavior' do
       lambda {
-        Differ.format = 'threeve'
+        Diffident.format = 'threeve'
       }.should raise_error('Unknown format type "threeve"')
     end
   end
 
   describe '#format_for' do
-    before(:each) { Differ.format = nil }
+    before(:each) { Diffident.format = nil }
 
     it 'should store any callable passed to it' do
       formatter = ->(c){ c.to_s }
-      Differ.format_for(formatter).should == formatter
+      Diffident.format_for(formatter).should == formatter
     end
 
     it 'should permit nil (default behavior)' do
-      Differ.format_for(nil).should == nil
+      Diffident.format_for(nil).should == nil
     end
 
     it 'should raise an error on undefined behavior' do
       lambda {
-        Differ.format_for('threeve')
+        Diffident.format_for('threeve')
       }.should raise_error('Unknown format type "threeve"')
     end
 
     describe 'when passed a symbol' do
-      it 'should translate the symbol :ascii into Differ::Format::Ascii' do
-        Differ.format_for(:ascii).should == Differ::Format::Ascii
+      it 'should translate the symbol :ascii into Diffident::Format::Ascii' do
+        Diffident.format_for(:ascii).should == Diffident::Format::Ascii
       end
 
-      it 'should translate the symbol :color into Differ::Format::Color' do
-        Differ.format_for(:color).should == Differ::Format::Color
+      it 'should translate the symbol :color into Diffident::Format::Color' do
+        Diffident.format_for(:color).should == Diffident::Format::Color
       end
 
-      it 'should translate the symbol :html into Differ::Format::HTML' do
-        Differ.format_for(:html).should == Differ::Format::HTML
+      it 'should translate the symbol :html into Diffident::Format::HTML' do
+        Diffident.format_for(:html).should == Diffident::Format::HTML
       end
     end
   end
 
   describe '#diff_by_char' do
     def diff_by_char
-      Differ.send(:diff_by_char, @to, @from)
+      Diffident.send(:diff_by_char, @to, @from)
     end
 
     before(:each) do
@@ -138,7 +138,7 @@ describe Differ do
 
   describe '#diff_by_word' do
     def diff_by_word
-      Differ.send(:diff_by_word, @to, @from)
+      Diffident.send(:diff_by_word, @to, @from)
     end
 
     before(:each) do
@@ -230,7 +230,7 @@ describe Differ do
 
   describe '#diff_by_line' do
     def diff_by_line
-      Differ.send(:diff_by_line, @to, @from)
+      Diffident.send(:diff_by_line, @to, @from)
     end
 
     before(:each) do
@@ -389,7 +389,7 @@ describe Differ do
 
   describe '#diff (with arbitrary boundary)' do
     def diff_by_comma
-      Differ.send(:diff, @to, @from, ', ')
+      Diffident.send(:diff, @to, @from, ', ')
     end
 
     before(:each) do
@@ -484,7 +484,7 @@ describe Differ do
 
   describe '#diff (with implied boundary)' do
     def diff_by_line
-      Differ.send(:diff, @to, @from)
+      Diffident.send(:diff, @to, @from)
     end
 
     before(:each) do

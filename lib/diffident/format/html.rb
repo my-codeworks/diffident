@@ -1,6 +1,6 @@
-module Differ
+module Diffident
   module Format
-    module Color
+    module HTML
       class << self
         def call(change)
           (change.change? && as_change(change)) ||
@@ -11,11 +11,11 @@ module Differ
 
       private
         def as_insert(change)
-          "\033[32m#{change.insert}\033[0m"
+          %Q{<ins class="Diffident">#{change.insert}</ins>}
         end
 
         def as_delete(change)
-          "\033[31m#{change.delete}\033[0m"
+          %Q{<del class="Diffident">#{change.delete}</del>}
         end
 
         def as_change(change)

@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Differ::Change do
+describe Diffident::Change do
   before(:each) do
     @format = Module.new { def self.call(c); end }
-    Differ.format = @format
+    Diffident.format = @format
   end
 
   describe '(empty)' do
     before(:each) do
-      @change = Differ::Change.new()
+      @change = Diffident::Change.new()
     end
 
     it 'should have a default insert' do
@@ -27,7 +27,7 @@ describe Differ::Change do
 
   describe '(insert only)' do
     before(:each) do
-      @change = Differ::Change.new(:insert => 'foo')
+      @change = Diffident::Change.new(:insert => 'foo')
     end
 
     it 'should populate the :insert parameter' do
@@ -43,7 +43,7 @@ describe Differ::Change do
 
   describe '(delete only)' do
     before(:each) do
-      @change = Differ::Change.new(:delete => 'bar')
+      @change = Diffident::Change.new(:delete => 'bar')
     end
 
     it 'should have a default :insert' do
@@ -59,7 +59,7 @@ describe Differ::Change do
 
   describe '(both insert and delete)' do
     before(:each) do
-      @change = Differ::Change.new(:insert => 'foo', :delete => 'bar')
+      @change = Diffident::Change.new(:insert => 'foo', :delete => 'bar')
     end
 
     it 'should populate the :insert parameter' do
@@ -77,6 +77,6 @@ describe Differ::Change do
 
   it "should stringify via the current format's #format method" do
     @format.should_receive(:call).once
-    Differ::Change.new.to_s
+    Diffident::Change.new.to_s
   end
 end

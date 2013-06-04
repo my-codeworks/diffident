@@ -1,26 +1,26 @@
 require 'spec_helper'
 
-describe Differ::Diff do
+describe Diffident::Diff do
   before(:each) do
-    Differ.separator = nil
-    @diff = Differ::Diff.new
+    Diffident.separator = nil
+    @diff = Diffident::Diff.new
   end
 
   describe '#to_s' do
     before(:each) do
-      @format = Differ.format
+      @format = Diffident.format
     end
 
     it 'should concatenate the result list' do
       diff('a', 'b', 'c').to_s.should == 'abc'
     end
 
-    it 'should concatenate without regard for the Differ.separator' do
-      Differ.separator = '*'
+    it 'should concatenate without regard for the Diffident.separator' do
+      Diffident.separator = '*'
       diff('a', 'b', 'c').to_s.should == 'abc'
     end
 
-    it 'should delegate insertion changes to Differ#format' do
+    it 'should delegate insertion changes to Diffident#format' do
       i = +'b'
       @format.should_receive(:call).once.with(i).and_return('!')
       diff('a', i, 'c').to_s.should == 'a!c'
@@ -30,7 +30,7 @@ describe Differ::Diff do
   describe '#format_as' do
     before(:each) do
       @change = +'b'
-      Differ.format = Module.new { def self.call(c); raise :error; end }
+      Diffident.format = Module.new { def self.call(c); raise :error; end }
       @format = Module.new { def self.call(c); end }
     end
 
@@ -39,8 +39,8 @@ describe Differ::Diff do
       diff('a', @change, 'c').format_as(@format).should == 'a!c'
     end
 
-    it 'should use Differ#format_for to grab the correct format' do
-      Differ.should_receive(:format_for).once.with(@format)
+    it 'should use Diffident#format_for to grab the correct format' do
+      Diffident.should_receive(:format_for).once.with(@format)
       diff().format_as(@format)
     end
   end
@@ -56,8 +56,8 @@ describe Differ::Diff do
       @diff.should == diff('abcd')
     end
 
-    it 'should join its arguments with Differ.separator' do
-      Differ.separator = '*'
+    it 'should join its arguments with Diffident.separator' do
+      Diffident.separator = '*'
       @diff.same(*'a*b*c*d'.split)
       @diff.should == diff('a*b*c*d')
     end
@@ -72,8 +72,8 @@ describe Differ::Diff do
         @diff.should == diff('ab')
       end
 
-      it 'should join to the last result with Differ.separator' do
-        Differ.separator = '*'
+      it 'should join to the last result with Diffident.separator' do
+        Diffident.separator = '*'
         @diff.same('b')
         @diff.should == diff('a*b')
       end
@@ -89,15 +89,15 @@ describe Differ::Diff do
         @diff.should == diff(('z' >> 'd'), 'a')
       end
 
-      it 'should prepend Differ.separator to the result' do
-        Differ.separator = '*'
+      it 'should prepend Diffident.separator to the result' do
+        Diffident.separator = '*'
         @diff.same('a')
         @diff.should == diff(('z' >> 'd'), '*a')
       end
 
-      it "should do nothing to a leading Differ.separator on the insert" do
+      it "should do nothing to a leading Diffident.separator on the insert" do
         @diff = diff('a', ('*-' >> '*+'))
-        Differ.separator = '*'
+        Diffident.separator = '*'
         @diff.same('c')
         @diff.should == diff('a', ('*-' >> '*+'), '*c')
       end
@@ -113,15 +113,15 @@ describe Differ::Diff do
         @diff.should == diff(-'z', 'a')
       end
 
-      it 'should append Differ.separator to the previous result' do
-        Differ.separator = '*'
+      it 'should append Diffident.separator to the previous result' do
+        Diffident.separator = '*'
         @diff.same('a')
         @diff.should == diff(-'z*', 'a')
       end
 
-      it "should relocate a leading Differ.separator on the delete to the previous item" do
+      it "should relocate a leading Diffident.separator on the delete to the previous item" do
         @diff = diff('a', -'*b')
-        Differ.separator = '*'
+        Diffident.separator = '*'
         @diff.same('c')
         @diff.should == diff('a*', -'b*', 'c')
       end
@@ -137,15 +137,15 @@ describe Differ::Diff do
         @diff.should == diff(+'z', 'a')
       end
 
-      it 'should append Differ.separator to the previous result' do
-        Differ.separator = '*'
+      it 'should append Diffident.separator to the previous result' do
+        Diffident.separator = '*'
         @diff.same('a')
         @diff.should == diff(+'z*', 'a')
       end
 
-      it "should relocate a leading Differ.separator on the insert to the previous item" do
+      it "should relocate a leading Diffident.separator on the insert to the previous item" do
         @diff = diff('a', +'*b')
-        Differ.separator = '*'
+        Diffident.separator = '*'
         @diff.same('c')
         @diff.should == diff('a*', +'b*', 'c')
       end
@@ -163,8 +163,8 @@ describe Differ::Diff do
       @diff.should == diff(-'abcd')
     end
 
-    it 'should join its arguments with Differ.separator' do
-      Differ.separator = '*'
+    it 'should join its arguments with Diffident.separator' do
+      Diffident.separator = '*'
       @diff.delete(*'a*b*c*d'.split)
       @diff.should == diff(-'a*b*c*d')
     end
@@ -180,8 +180,8 @@ describe Differ::Diff do
           @diff.should == diff(-'ab')
         end
 
-        it 'should join to the last result with Differ.separator' do
-          Differ.separator = '*'
+        it 'should join to the last result with Diffident.separator' do
+          Diffident.separator = '*'
           @diff.delete('b')
           @diff.should == diff(-'a*b')
         end
@@ -197,9 +197,9 @@ describe Differ::Diff do
           @diff.should == diff('b' >> 'a')
         end
 
-        it "should relocate a leading Differ.separator on the insert to the previous item" do
+        it "should relocate a leading Diffident.separator on the insert to the previous item" do
           @diff = diff('a', +'*b')
-          Differ.separator = '*'
+          Diffident.separator = '*'
           @diff.delete('z')
           @diff.should == diff('a*', ('z' >> 'b'))
         end
@@ -216,8 +216,8 @@ describe Differ::Diff do
         @diff.should == diff('a', -'b')
       end
 
-      it 'should prepend Differ.separator to the result' do
-        Differ.separator = '*'
+      it 'should prepend Diffident.separator to the result' do
+        Diffident.separator = '*'
         @diff.delete('b')
         @diff.should == diff('a', -'*b')
       end
@@ -235,8 +235,8 @@ describe Differ::Diff do
       @diff.should == diff(+'abcd')
     end
 
-    it 'should join its arguments with Differ.separator' do
-      Differ.separator = '*'
+    it 'should join its arguments with Diffident.separator' do
+      Diffident.separator = '*'
       @diff.insert(*'a*b*c*d'.split)
       @diff.should == diff(+'a*b*c*d')
     end
@@ -252,9 +252,9 @@ describe Differ::Diff do
           @diff.should == diff('b' >> 'a')
         end
 
-        it "should relocate a leading Differ.separator on the delete to the previous item" do
+        it "should relocate a leading Diffident.separator on the delete to the previous item" do
           @diff = diff('a', -'*b')
-          Differ.separator = '*'
+          Diffident.separator = '*'
           @diff.insert('z')
           @diff.should == diff('a*', ('b' >> 'z'))
         end
@@ -270,8 +270,8 @@ describe Differ::Diff do
           @diff.should == diff(+'ab')
         end
 
-        it 'should join to the last result with Differ.separator' do
-          Differ.separator = '*'
+        it 'should join to the last result with Diffident.separator' do
+          Diffident.separator = '*'
           @diff.insert('b')
           @diff.should == diff(+'a*b')
         end
@@ -288,8 +288,8 @@ describe Differ::Diff do
         @diff.should == diff('a', +'b')
       end
 
-      it 'should prepend Differ.separator to the result' do
-        Differ.separator = '*'
+      it 'should prepend Diffident.separator to the result' do
+        Diffident.separator = '*'
         @diff.insert('b')
         @diff.should == diff('a', +'*b')
       end

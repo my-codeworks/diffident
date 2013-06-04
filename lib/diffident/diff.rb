@@ -1,4 +1,4 @@
-module Differ
+module Diffident
   class Diff
     def initialize
       @raw = []
@@ -72,7 +72,7 @@ module Differ
     end
 
     def format_as(f)
-      f = Differ.format_for(f)
+      f = Diffident.format_for(f)
       @raw.inject('') do |sum, part|
         part = case part
         when String then part
@@ -89,7 +89,7 @@ module Differ
 
   private
     def sep
-      "#{Differ.separator}"
+      Diffident.separator.is_a?(Regexp) ? '' : "#{Diffident.separator}"
     end
   end
 end

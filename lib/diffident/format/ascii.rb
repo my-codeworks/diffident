@@ -1,4 +1,4 @@
-module Differ
+module Diffident
   module Format
     module Ascii
       class << self

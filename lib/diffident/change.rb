@@ -1,4 +1,4 @@
-module Differ
+module Diffident
   class Change # :nodoc:
     attr_accessor :insert, :delete
     def initialize(options = {})
@@ -19,7 +19,7 @@ module Differ
     end
 
     def to_s
-      Differ.format.call(self)
+      Diffident.format.call(self)
     end
     alias :inspect :to_s
 

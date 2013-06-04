@@ -155,4 +155,4 @@ start significantly changing what it does, I'd rather you did! Make it your own
 little work of art, complete with a stylish flowing signature in the corner. All
 I really did was give you the canvas.  And my blessing.
 
-  Know always right from wrong, and let others see your good works.
+> Know always right from wrong, and let others see your good works.

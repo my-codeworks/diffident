@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/diffident.png)](http://badge.fury.io/rb/diffident)
 [![TravisCI Build Status](https://secure.travis-ci.org/my-codeworks/diffident.png?branch=master)](http://travis-ci.org/my-codeworks/diffident)
-[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/my-codeworks/diffident)
+[![Code Climate](https://codeclimate.com/github/my-codeworks/diffident.png)](https://codeclimate.com/github/my-codeworks/diffident)
 
 > Based on the [differ](http://github.com/pvande/differ) gem by Pieter Vande Bruggen
 

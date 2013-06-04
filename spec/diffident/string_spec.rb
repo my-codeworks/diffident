@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'Diffident/string'
+require 'diffident/string'
 
 describe Diffident::StringDiffident do
   it 'should be automatically mixed into String' do

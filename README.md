@@ -12,7 +12,7 @@ It also gives you raw access to the diff structure, should you need it, so you c
 
 ## Internals
 
-Diffident uses the ruby StringScan object to walk through the input and collect Diffidentances. It records additions, subtractions, changes and can merge two diffs that might additionally contain conflicts.
+Diffident uses the Ruby StringScan class to walk through the input and collect differances. It records additions, subtractions, changes and can merge two diffs that might additionally contain conflicts.
 
 ## Installation
 

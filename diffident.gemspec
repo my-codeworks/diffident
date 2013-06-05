@@ -14,10 +14,12 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.files         = Dir.glob("lib/**/*") + %w(LICENSE README.md CHANGELOG.md)
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = Dir.glob("spec/**/*")
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
+  spec.add_development_dependency "guard"
+  spec.add_development_dependency "guard-rspec"
 end

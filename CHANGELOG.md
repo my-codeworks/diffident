@@ -1,3 +1,15 @@
+# 0.2.0
+
+## TL;DR
+
+Enables the external interface to work with files as well as strings.
+
+Rewrites the parser class, `Tokenizer`, to use `StringScanner` instead of looping over arrays of strings.
+
+Adds primitives for all the possible changes (addition, deletion, update, conflict, no change) based on a common superclass, `Change`.
+
+Exposes and documents the diff structure as an API.
+
 # 0.1.0
 
 ## TL;DR

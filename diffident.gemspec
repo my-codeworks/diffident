@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "http://github.com/my-codeworks/diffident"
   spec.license       = "MIT"
 
-  spec.files         = Dir.glob("lib/**/*") + %w(LICENSE README.md)
+  spec.files         = Dir.glob("lib/**/*") + %w(LICENSE README.md CHANGELOG.md)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 

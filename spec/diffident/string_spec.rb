@@ -7,7 +7,7 @@ describe Diffident::StringDiffident do
   end
 
   before(:each) do
-    Diffident.separator = nil
+    Diffident.delimiter = nil
   end
 
   describe '#diff' do
@@ -16,9 +16,9 @@ describe Diffident::StringDiffident do
       'TO'.diff('FROM')
     end
 
-    it 'should call Diffident#diff with Diffident.separator' do
-      Diffident.separator = 'x'
-      Diffident.should_receive(:diff).with('TO', 'FROM', Diffident.separator).once
+    it 'should call Diffident#diff with Diffident.delimiter' do
+      Diffident.delimiter = 'x'
+      Diffident.should_receive(:diff).with('TO', 'FROM', Diffident.delimiter).once
       'TO'.diff('FROM')
     end
   end
@@ -29,9 +29,9 @@ describe Diffident::StringDiffident do
       'TO' - 'FROM'
     end
 
-    it 'should call Diffident#diff with Diffident.separator' do
-      Diffident.separator = 'x'
-      Diffident.should_receive(:diff).with('TO', 'FROM', Diffident.separator).once
+    it 'should call Diffident#diff with Diffident.delimiter' do
+      Diffident.delimiter = 'x'
+      Diffident.should_receive(:diff).with('TO', 'FROM', Diffident.delimiter).once
       'TO' - 'FROM'
     end
   end

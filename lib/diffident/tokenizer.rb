@@ -1,9 +1,9 @@
 module Diffident
   class Tokenizer
 
-    def initialize(this, base, separator)
-      @this = this.split(separator)
-      @base = base.split(separator)
+    def initialize(this, base, delimiter)
+      @this = this.split(delimiter)
+      @base = base.split(delimiter)
       @diff = Diff.new
     end
 

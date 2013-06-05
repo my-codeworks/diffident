@@ -8,22 +8,22 @@ require 'diffident/format/html'
 module Diffident
   class << self
 
-    def separator=(separator)
-      @@separator = separator
+    def delimiter=(delimiter)
+      @@delimiter = delimiter
     end
 
-    def separator
-      @@separator
+    def delimiter
+      @@delimiter
     end    
 
     def diff(this, base, new_sep = "\n")
-      old_sep = self.separator
-      self.separator = new_sep
+      old_sep = self.delimiter
+      self.delimiter = new_sep
 
       tokenizer = Diffident::Tokenizer.new(this, base, new_sep)
       tokenizer.run
     ensure
-      self.separator = old_sep
+      self.delimiter = old_sep
     end
 
     def diff_by_char(to, from)

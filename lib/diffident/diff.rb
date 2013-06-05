@@ -89,7 +89,7 @@ module Diffident
 
   private
     def sep
-      Diffident.separator.is_a?(Regexp) ? '' : "#{Diffident.separator}"
+      Diffident.delimiter.is_a?(Regexp) ? '' : "#{Diffident.delimiter}"
     end
   end
 end

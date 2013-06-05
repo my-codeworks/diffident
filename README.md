@@ -87,7 +87,7 @@ Diffident.diff(@original, @current, /[a-z]i/)
 # => E{"c wolfman f" >> "c lolcat f"}l!
 ```
 
-Include a capture group if you want to keep the separator:
+Include a capture group if you want to keep the delimiter:
 
 ```ruby
 Diffident.diff(@original, @current, /([a-z]i)/)
@@ -109,15 +109,15 @@ Or a lot more inline:
 @current - @original # Implicitly by line by default
 # => {"Epic lolcat fail!" >> "Epic wolfman fail!"}
 
-Diffident.separator = ' ' # Custom string
+Diffident.delimiter = ' ' # Custom string
 @current - @original
 # => Epic {"lolcat" >> "wolfman"} fail!
 
-Diffident.separator = /[a-z]i/ # Custom regex without capture group
+Diffident.delimiter = /[a-z]i/ # Custom regex without capture group
 @original - @current
 # => E{"c wolfman f" >> "c lolcat f"}l!
 
-Diffident.separator = /([a-z]i)/ # Custom regex with capture group
+Diffident.delimiter = /([a-z]i)/ # Custom regex with capture group
 @original - @current
 # => Epi{"c wolfman f" >> "c lolcat f"}ail!
 ```

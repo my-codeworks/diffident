@@ -12,7 +12,7 @@ describe Diffident::StringDiffident do
 
   describe '#diff' do
     it 'should call Diffident#diff' do
-      Diffident.should_receive(:diff).with('TO', 'FROM', "\n").once
+      Diffident.should_receive(:diff).with('TO', 'FROM', "").once
       'TO'.diff('FROM')
     end
 
@@ -25,7 +25,7 @@ describe Diffident::StringDiffident do
 
   describe '#-' do
     it 'should call Diffident#diff' do
-      Diffident.should_receive(:diff).with('TO', 'FROM', "\n").once
+      Diffident.should_receive(:diff).with('TO', 'FROM', "").once
       'TO' - 'FROM'
     end
 

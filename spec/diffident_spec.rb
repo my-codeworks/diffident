@@ -5,12 +5,12 @@ describe Diffident do
     before(:each) { Diffident.format = nil }
 
     it 'should return the last value it was set to' do
-      Diffident.format = Diffident::Format::HTML
-      Diffident.format.should == Diffident::Format::HTML
+      Diffident.format = Diffident::Formats::HTML
+      Diffident.format.should == Diffident::Formats::HTML
     end
 
-    it 'should default to Diffident::Format::Ascii' do
-      Diffident.format.should == Diffident::Format::Ascii
+    it 'should default to Diffident::Formats::Ascii' do
+      Diffident.format.should == Diffident::Formats::Ascii
     end
   end
 
@@ -46,16 +46,16 @@ describe Diffident do
     end
 
     describe 'when passed a symbol' do
-      it 'should translate the symbol :ascii into Diffident::Format::Ascii' do
-        Diffident.format_for(:ascii).should == Diffident::Format::Ascii
+      it 'should translate the symbol :ascii into Diffident::Formats::Ascii' do
+        Diffident.format_for(:ascii).should == Diffident::Formats::Ascii
       end
 
-      it 'should translate the symbol :color into Diffident::Format::Color' do
-        Diffident.format_for(:color).should == Diffident::Format::Color
+      it 'should translate the symbol :color into Diffident::Formats::Color' do
+        Diffident.format_for(:color).should == Diffident::Formats::Color
       end
 
-      it 'should translate the symbol :html into Diffident::Format::HTML' do
-        Diffident.format_for(:html).should == Diffident::Format::HTML
+      it 'should translate the symbol :html into Diffident::Formats::HTML' do
+        Diffident.format_for(:html).should == Diffident::Formats::HTML
       end
     end
   end

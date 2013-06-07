@@ -1,9 +1,10 @@
 require 'diffident/change'
 require 'diffident/diff'
 require 'diffident/tokenizer'
-require 'diffident/format/ascii'
-require 'diffident/format/color'
-require 'diffident/format/html'
+require 'diffident/format'
+require 'diffident/formats/ascii'
+require 'diffident/formats/color'
+require 'diffident/formats/html'
 
 module Diffident
   class << self
@@ -13,7 +14,7 @@ module Diffident
     end
 
     def delimiter
-      @@delimiter
+      @@delimiter ||= ""
     end    
 
     def diff(this, base, new_sep = "\n")
@@ -43,7 +44,7 @@ module Diffident
     end
 
     def format
-      return @format || Format::Ascii
+      return @format || Formats::Ascii
     end
 
     def format_for(f)
@@ -51,9 +52,9 @@ module Diffident
         f
       else       
         case f
-        when :ascii then Format::Ascii
-        when :color then Format::Color
-        when :html  then Format::HTML
+        when :ascii then Formats::Ascii
+        when :color then Formats::Color
+        when :html  then Formats::HTML
         when nil    then nil
         else raise "Unknown format type #{f.inspect}"
         end

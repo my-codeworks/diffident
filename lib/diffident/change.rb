@@ -21,6 +21,14 @@ module Diffident
     def to_s
       Diffident.format.call(self)
     end
+
+    def for_formatting
+      a = []
+      a << delete if delete?
+      a << insert if insert?
+      a
+    end
+
     alias :inspect :to_s
 
     def ==(other)

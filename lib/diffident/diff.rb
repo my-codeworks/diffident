@@ -1,79 +1,56 @@
 module Diffident
   class Diff
+
     def initialize
-      @raw = []
+      @changes = []
     end
 
-    def same(*str)
-      return if str.empty?
-      if @raw.last.is_a? String
-        @raw.last << sep
-      elsif @raw.last.is_a? Change
-        if @raw.last.change?
-          @raw << sep
+    def same( *lexems )
+      if last_change.is_a? String
+        last_change << change_text_from( '', *lexems )
+      elsif last_change.is_a? Change
+        if last_change.change?
+          lexems.unshift('')
         else
-          change = @raw.pop
-          if change.insert? && @raw.last
-            @raw.last << sep if change.insert.sub!(/^#{Regexp.quote(sep)}/, '')
-          end
-          if change.delete? && @raw.last
-            @raw.last << sep if change.delete.sub!(/^#{Regexp.quote(sep)}/, '')
-          end
-          @raw << change
-
-          @raw.last.insert << sep if @raw.last.insert?
-          @raw.last.delete << sep if @raw.last.delete?
-          @raw << ''
+          update_insert
+          update_delete
         end
+        changes << change_text_from( lexems )
       else
-        @raw << ''
+        changes << change_text_from( lexems )
       end
-      @raw.last << str.join(sep)
     end
 
-    def delete(*str)
-      return if str.empty?
-      if @raw.last.is_a? Change
-        change = @raw.pop
-        if change.insert? && @raw.last
-          @raw.last << sep if change.insert.sub!(/^#{Regexp.quote(sep)}/, '')
-        end
-        change.delete << sep if change.delete?
+    def delete(*lexems)
+      if last_change.is_a? Change
+        update_delete
       else
-        change = Change.new(:delete => @raw.empty? ? '' : sep)
+        add_new_change( delete: last_change.nil? ? '' : delim )
       end
-
-      @raw << change
-      @raw.last.delete << str.join(sep)
+      last_change.delete << change_text_from( lexems )
     end
 
-    def insert(*str)
-      return if str.empty?
-      if @raw.last.is_a? Change
-        change = @raw.pop
-        if change.delete? && @raw.last
-          @raw.last << sep if change.delete.sub!(/^#{Regexp.quote(sep)}/, '')
-        end
-        change.insert << sep if change.insert?
+    def insert(*lexems)
+      if last_change.is_a? Change
+        update_insert
       else
-        change = Change.new(:insert => @raw.empty? ? '' : sep)
+        add_new_change( insert: last_change.nil? ? '' : delim )
       end
 
-      @raw << change
-      @raw.last.insert << str.join(sep)
+      last_change.insert << change_text_from( lexems )
     end
 
     def ==(other)
-      @raw == other.raw_array
+      @changes == other.raw_array
     end
 
     def to_s
-      @raw.join()
+      @changes.join()
     end
 
     def format_as(f)
       f = Diffident.format_for(f)
-      @raw.inject('') do |sum, part|
+      @changes.inject('') do |sum, part|
         part = case part
         when String then part
         when Change then f.call(part)
@@ -83,13 +60,62 @@ module Diffident
     end
 
   protected
+
     def raw_array
-      @raw
+      @changes
     end
 
   private
-    def sep
+
+    def changes
+      @changes
+    end
+
+    def last_change
+      changes[-1]
+    end
+
+    def second_to_last_change
+      changes[-2]
+    end
+
+    def update_delete
+      append_delimiter_to_second_to_last_change if second_to_last_change and delimiter_removed_from_start_of_last_changes?( :insert )
+      append_delimiter_to_last_changes( :delete ) if last_change.delete?
+    end
+
+    def update_insert
+      append_delimiter_to_second_to_last_change if second_to_last_change and delimiter_removed_from_start_of_last_changes?( :delete )
+      append_delimiter_to_last_changes( :insert ) if last_change.insert?
+    end
+
+    def append_delimiter_to_second_to_last_change
+      second_to_last_change << delim
+    end
+
+    def removed_delimiter_from_start_of?( what )
+      not what.sub!(/^#{Regexp.quote(delim)}/, '').to_s.empty?
+    end
+
+    def delimiter_removed_from_start_of_last_changes?( part )
+      removed_delimiter_from_start_of?( last_change.send( part ) )
+    end
+
+    def append_delimiter_to_last_changes( part )
+      last_change.send( part ) << delim
+    end
+
+    def add_new_change( args = {} )
+      changes << Change.new( args )
+    end
+
+    def change_text_from( *lexems )
+      lexems.join(delim)
+    end
+
+    def delim
       Diffident.delimiter.is_a?(Regexp) ? '' : "#{Diffident.delimiter}"
     end
+
   end
 end

@@ -9,7 +9,8 @@ module Diffident
 
     def run
       advance until @base.empty? || @this.empty?
-      @diff.insert(*@this) || @diff.delete(*@base)
+      @diff.insert(*@this) unless @this.empty?
+      @diff.delete(*@base) unless @base.empty?
       return @diff
     end
 
@@ -23,21 +24,22 @@ module Diffident
       delete = @base.index(add)
 
       if del == add
-        @diff.same(add)
-      elsif insert && prioritize_insert
+        @diff.same(add) unless add.empty?
+      elsif (insert && prioritize_insert) || (insert && !delete)
         change(:insert, @this.unshift(add), insert)
       elsif delete
         change(:delete, @base.unshift(del), delete)
-      elsif insert
-        change(:insert, @this.unshift(add), insert)
       else
-        @diff.insert(add) && @diff.delete(del)
+        @diff.insert(add) unless add.empty?
+        @diff.delete(del) unless del.empty?
       end
     end
 
     def change(method, array, index)
-      @diff.send(method, *array.slice!(0..index))
-      @diff.same(array.shift)
+      sub_array = array.slice!(0..index)
+      el = array.shift
+      @diff.send(method, *sub_array) unless sub_array.empty?
+      @diff.same(el) unless el.empty?
     end
   end
 end

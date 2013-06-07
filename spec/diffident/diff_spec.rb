@@ -36,7 +36,7 @@ describe Diffident::Diff do
   describe '#format_as' do
     before(:each) do
       @change = +'b'
-      Diffident.format = Module.new { def self.call(c); raise :error; end }
+      Diffident.format = Module.new { def self.call(c); raise Exception; end }
       @format = Module.new { def self.call(c); end }
     end
 

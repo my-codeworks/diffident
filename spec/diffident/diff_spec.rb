@@ -1,5 +1,11 @@
 require 'spec_helper'
 
+def diff(*parts)
+  x = Diffident::Diff.new
+  x.instance_variable_set(:@changes, parts)
+  return x
+end
+
 describe Diffident::Diff do
   before(:each) do
     Diffident.delimiter = nil

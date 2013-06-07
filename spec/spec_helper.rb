@@ -8,12 +8,6 @@ RSpec.configure do |c|
   c.color = true
 end
 
-def diff(*parts)
-  x = Diffident::Diff.new
-  x.instance_variable_set(:@raw, parts)
-  return x
-end
-
 class String
   def +@
     Diffident::Change.new(:insert => self)

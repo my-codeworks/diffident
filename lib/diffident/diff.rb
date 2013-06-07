@@ -36,7 +36,6 @@ module Diffident
       else
         add_new_change( insert: last_change.nil? ? '' : delim )
       end
-
       last_change.insert << change_text_from( lexems )
     end
 

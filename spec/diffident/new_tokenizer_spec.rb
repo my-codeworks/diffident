@@ -58,7 +58,7 @@ describe Diffident::NewTokenizer do
     it "are correctly marked" do
       t = Diffident::NewTokenizer.new( 'spec/support/files/changed/base.css', 'spec/support/files/changed/complex_this.css' )
       diff = t.process
-      diff_print(diff)
+      # diff_print(diff)
       diff.each do |change|
         case change.this_row
           when 9..12, 19..23

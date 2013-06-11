@@ -1,5 +1,24 @@
 class Diffident::Tokenizer::CommonSequence
 
+  class Book
+    def initialize( base_length, this_length )
+      @book = Array.new(base_length){ [0] * this_length }
+      @longest_length = 0
+      @longest_end_pos = 0
+    end
+
+    attr_reader :longest_length, :longest_end_pos
+
+    def update( base_index, this_index )
+      @book[base_index][this_index] = 1
+      @book[base_index][this_index] += @book[base_index-1][this_index-1]
+      if @book[base_index][this_index] > @longest_length
+        @longest_length = @book[base_index][this_index]
+        @longest_end_pos = base_index
+      end
+    end
+  end
+
   def self.find( base, this )
     sequencer = self.new( base, this )
     sequencer.find
@@ -26,7 +45,7 @@ private
   end
 
   def slice_array(array, start_pos, end_pos)
-    head = start_pos-1 > 0 ? array[0..start_pos-1] : []
+    head = start_pos > 0 ? array[0..start_pos-1] : []
     body = array[start_pos..end_pos]
     tail = end_pos+1 < array.length ? array[end_pos+1..-1] : []
     [head, body, tail]
@@ -38,7 +57,7 @@ private
     slice_array(array, start_pos, end_pos)
   end
 
-  def complete_subsequence( base_array, this_array, indent = 0 )
+  def complete_subsequence( base_array, this_array )
     subssequence, base_ss_start, base_ss_end = longest_common_subsequence( base_array, this_array )
     
     if subssequence.compact.any?
@@ -47,13 +66,13 @@ private
       this_head, _, this_tail = partition_array(this_array, subssequence.compact)
 
       if base_head.any? and this_head.any?
-        ss = complete_subsequence( base_head, this_head, indent+1 )
-        subssequence.insert(0, *ss.compact) if ss.compact.any?
+        ss = complete_subsequence( base_head, this_head )
+        subssequence[0..ss.length-1] = *ss if ss.compact.any?
       end
 
       if base_tail.any? and this_tail.any?
-        ss = complete_subsequence( base_tail, this_tail, indent+1 )
-        subssequence.insert(subssequence.length-1-ss.length-1, *ss.compact) if ss.compact.any?
+        ss = complete_subsequence( base_tail, this_tail )
+        subssequence[subssequence.length-ss.length..-1] = *ss if ss.compact.any?
       end
 
     end
@@ -61,28 +80,21 @@ private
     subssequence
   end
 
-  def longest_common_subsequence(s1, s2)
-    return [], 0, 0 if s1.empty? or s2.empty?
-    m = Array.new(s1.length){ [0] * s2.length }
-    longest_length, longest_end_pos = 0,0
-    (0 .. s1.length - 1).each do |x|
-      (0 .. s2.length - 1).each do |y|
-        if s1[x] == s2[y]
-          m[x][y] = 1
-          if (x > 0 && y > 0)
-            m[x][y] += m[x-1][y-1]
-          end
-          if m[x][y] > longest_length
-            longest_length = m[x][y]
-            longest_end_pos = x
-          end
-        end
+  def longest_common_subsequence( base, this )
+
+    book = Book.new( base.length, this.length )
+
+    base.each_with_index do |base_element, base_index|
+      this.each_with_index do |this_element, this_index|
+        book.update( base_index, this_index ) if base_element == this_element
       end
     end
-    longest_start_pos = longest_end_pos - longest_length + 1
-    ss = Array.new( s1.length )
-    ss.insert(longest_start_pos, *s1[longest_start_pos .. longest_end_pos])
-    return ss, longest_start_pos, longest_end_pos
+
+    longest_start_pos = book.longest_end_pos - book.longest_length + 1
+
+    ss = Array.new( base.length )
+    ss[longest_start_pos..book.longest_end_pos] = *base[longest_start_pos .. book.longest_end_pos]
+    return ss, longest_start_pos, book.longest_end_pos
   end
 
 end

@@ -12,22 +12,26 @@ module Diffident
       initialize_string_scanner
     end
 
-    def next()
+    def next
       lexem_with_delimiter = string_scanner.scan_until(delimiter)
       if lexem_with_delimiter.nil?
         replenish_string_scanner_from_input
         if input_has_raised and string_scanner.eos?
           raise StopIteration
         elsif input_has_raised
-          result = string_scanner.rest
+          @latest_match = string_scanner.rest
           string_scanner.terminate
-          return result
         else
           self.next()
         end
       else
-        return lexem_with_delimiter[/(.*)#{delimiter}/, 1]
+        @latest_match = lexem_with_delimiter[/(.*)#{delimiter}/, 1]
       end
+      @latest_match
+    end
+
+    def latest
+      @latest_match
     end
 
     def has_more_lexems?

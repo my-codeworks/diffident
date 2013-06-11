@@ -1,0 +1,25 @@
+@import url(http://fonts.googleapis.com/css?family=Cinzel:400,700);
+
+#login_box {
+  background: #eee;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+  margin: 10px;
+  padding: 10px 15px;
+}
+
+nav .row {
+  margin-bottom:0;
+}
+
+nav {
+  border-bottom: 2px solid;
+  background: #def;
+  font-family: 'Cinzel', serif;
+  font-weight:bold;
+  text-align:center;
+}
+
+article[role=main] {
+  padding:0 5%;
+}

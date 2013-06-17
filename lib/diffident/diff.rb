@@ -40,7 +40,7 @@ module Diffident
     end
 
     def ==(other)
-      @changes == other.raw_array
+      @changes == other.changes
     end
 
     def to_s
@@ -60,15 +60,11 @@ module Diffident
 
   protected
 
-    def raw_array
+    def changes
       @changes
     end
 
   private
-
-    def changes
-      @changes
-    end
 
     def last_change
       changes[-1]
@@ -105,7 +101,7 @@ module Diffident
     end
 
     def add_new_change( args = {} )
-      changes << Change.new( args )
+      changes << Diffident::Change.new( args )
     end
 
     def change_text_from( *lexems )

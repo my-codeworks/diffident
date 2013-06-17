@@ -57,24 +57,29 @@ private
     slice_array(array, start_pos, end_pos)
   end
 
+  def subsequence_head( subssequence, base_head, this_head )
+    if base_head.any? and this_head.any?
+      ss = complete_subsequence( base_head, this_head )
+      subssequence[0..ss.length-1] = *ss if ss.compact.any?
+    end
+  end
+
+  def subsequence_tail( subssequence, base_tail, this_tail )
+    if base_tail.any? and this_tail.any?
+      ss = complete_subsequence( base_tail, this_tail )
+      subssequence[subssequence.length-ss.length..-1] = *ss if ss.compact.any?
+    end
+  end
+
   def complete_subsequence( base_array, this_array )
     subssequence, base_ss_start, base_ss_end = longest_common_subsequence( base_array, this_array )
     
     if subssequence.compact.any?
-    
-      base_head, _, base_tail = slice_array(base_array, base_ss_start, base_ss_end)
+      base_head, _, base_tail = slice_array(base_array, base_ss_start, base_ss_end)  
       this_head, _, this_tail = partition_array(this_array, subssequence.compact)
 
-      if base_head.any? and this_head.any?
-        ss = complete_subsequence( base_head, this_head )
-        subssequence[0..ss.length-1] = *ss if ss.compact.any?
-      end
-
-      if base_tail.any? and this_tail.any?
-        ss = complete_subsequence( base_tail, this_tail )
-        subssequence[subssequence.length-ss.length..-1] = *ss if ss.compact.any?
-      end
-
+      subsequence_head( subssequence, base_head, this_head )
+      subsequence_tail( subssequence, base_tail, this_tail )
     end
 
     subssequence

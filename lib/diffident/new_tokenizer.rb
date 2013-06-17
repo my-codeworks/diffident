@@ -43,8 +43,8 @@ module Diffident
     end
 
     def process_remaining_changes
-      add_remaining_base_lexems_as_deletions
-      add_remaining_this_lexems_as_additions
+      add_remaining_lexems_as( :deletion, @base_file )
+      add_remaining_lexems_as( :addition, @this_file )
       add_remaining_tail_lexems_as_same
     end
 
@@ -77,19 +77,11 @@ module Diffident
       file_lexer.lexems[from .. to]
     end
 
-    def add_remaining_this_lexems_as_additions
-      last_row_of_interest = @this_file.lexems.length - @tail_length + 1
-      while @this_file.row <= last_row_of_interest and @this_file.current_lexem
-        diff << Diffident::Diff::NewChange.new(action: :addition, row: @this_file.row, text: @this_file.current_lexem)
-        @this_file.next_lexem
-      end
-    end
-
-    def add_remaining_base_lexems_as_deletions
-      last_row_of_interest = @base_file.lexems.length - @tail_length + 1
-      while @base_file.row <= last_row_of_interest and @base_file.current_lexem
-        diff << Diffident::Diff::NewChange.new(action: :deletion, row: @base_file.row, text: @base_file.current_lexem)
-        @base_file.next_lexem
+    def add_remaining_lexems_as( action, file_lexer )
+      last_row_of_interest = file_lexer.lexems.length - @tail_length + 1
+      while file_lexer.row <= last_row_of_interest and file_lexer.current_lexem
+        diff << Diffident::Diff::NewChange.new(action: action, row: file_lexer.row, text: file_lexer.current_lexem)
+        file_lexer.next_lexem
       end
     end
 
@@ -104,8 +96,8 @@ module Diffident
     def process_complete_common_sequence( css )
       css.each_with_index do |line, row|
         unless line.nil?
-          add_base_lexems_up_to_this_line_as_deletions( line )
-          add_this_lexems_up_to_this_line_as_additions( line )
+          add_lexems_up_to_this_line_as( :deletion, @base_file, line )
+          add_lexems_up_to_this_line_as( :addition, @this_file, line )
           diff << Diffident::Diff::NewChange.new(action: :same, rows: [@base_file.row, @this_file.row], text: line)
           @base_file.next_lexem
           @this_file.next_lexem
@@ -113,17 +105,10 @@ module Diffident
       end
     end
 
-    def add_base_lexems_up_to_this_line_as_deletions( line )
-      while @base_file.current_lexem != line do
-        diff << Diffident::Diff::NewChange.new(action: :deletion, row: @base_file.row, text: @base_file.current_lexem)
-        @base_file.next_lexem
-      end
-    end
-
-    def add_this_lexems_up_to_this_line_as_additions( line )
-      while @this_file.current_lexem != line do
-        diff << Diffident::Diff::NewChange.new(action: :addition, row: @this_file.row, text: @this_file.current_lexem)
-        @this_file.next_lexem
+    def add_lexems_up_to_this_line_as( action, file_lexer, line )
+      while file_lexer.current_lexem != line do
+        diff << Diffident::Diff::NewChange.new(action: action, row: file_lexer.row, text: file_lexer.current_lexem)
+        file_lexer.next_lexem
       end
     end
 

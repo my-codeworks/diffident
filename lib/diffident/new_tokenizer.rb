@@ -4,6 +4,7 @@ module Diffident
     require 'diffident/tokenizer/file_lexer'
     require 'diffident/tokenizer/common_sequence'
     require 'diffident/diff/new_change'
+    require 'diffident/new_diff'
 
     def initialize( base_file_name, this_file_name )
       @base_file_name = base_file_name
@@ -48,10 +49,14 @@ module Diffident
       add_remaining_tail_lexems_as_same
     end
 
+    def leading_lexems_are_the_same?
+      lexems_equal = @base_file.next_lexem == @this_file.next_lexem
+      lexems_not_nil = (not @base_file.current_lexem.nil?)
+      lexems_equal and lexems_not_nil
+    end
+
     def reduce_problem_size_by_skipping_leading_lexems_that_are_unchanged
-      while @base_file.next_lexem == @this_file.next_lexem and not @base_file.current_lexem.nil?
-        diff << Diffident::Diff::NewChange.new(action: :same, rows: [@base_file.row, @this_file.row], text: @base_file.current_lexem)
-      end
+      add_same_line_to_diff while leading_lexems_are_the_same?
     end
 
     def max_tail_length 
@@ -80,14 +85,13 @@ module Diffident
     def add_remaining_lexems_as( action, file_lexer )
       last_row_of_interest = file_lexer.lexems.length - @tail_length + 1
       while file_lexer.row <= last_row_of_interest and file_lexer.current_lexem
-        diff << Diffident::Diff::NewChange.new(action: action, row: file_lexer.row, text: file_lexer.current_lexem)
-        file_lexer.next_lexem
+        add_line_to_diff_and_advance_file_lexer( action, file_lexer )
       end
     end
 
     def add_remaining_tail_lexems_as_same
       while @base_file.current_lexem and @base_file.current_lexem
-        diff << Diffident::Diff::NewChange.new(action: :same, rows: [@base_file.row, @this_file.row], text: @base_file.current_lexem)
+        add_same_line_to_diff
         @base_file.next_lexem
         @this_file.next_lexem
       end
@@ -98,7 +102,7 @@ module Diffident
         unless line.nil?
           add_lexems_up_to_this_line_as( :deletion, @base_file, line )
           add_lexems_up_to_this_line_as( :addition, @this_file, line )
-          diff << Diffident::Diff::NewChange.new(action: :same, rows: [@base_file.row, @this_file.row], text: line)
+          add_same_line_to_diff
           @base_file.next_lexem
           @this_file.next_lexem
         end
@@ -107,13 +111,22 @@ module Diffident
 
     def add_lexems_up_to_this_line_as( action, file_lexer, line )
       while file_lexer.current_lexem != line do
-        diff << Diffident::Diff::NewChange.new(action: action, row: file_lexer.row, text: file_lexer.current_lexem)
-        file_lexer.next_lexem
+        add_line_to_diff_and_advance_file_lexer( action, file_lexer )
+        
       end
     end
 
+    def add_line_to_diff_and_advance_file_lexer( action, file_lexer )
+      diff.add(action: action, row: file_lexer.row, text: file_lexer.current_lexem)
+      file_lexer.next_lexem
+    end
+
+    def add_same_line_to_diff
+      diff.add_same(rows: [@base_file.row, @this_file.row], text: @base_file.current_lexem)
+    end
+
     def diff
-      @diff ||= []
+      @diff ||= NewDiff.new
     end
     
   end

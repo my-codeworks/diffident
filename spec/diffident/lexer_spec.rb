@@ -35,6 +35,10 @@ describe Diffident::Lexer do
         subject.has_more_lexems?.should == false
       end
 
+      it "sholud return nil on .latest()" do
+        subject.latest.should == nil
+      end
+
     end
 
     context "with string delimiter" do
@@ -54,6 +58,12 @@ describe Diffident::Lexer do
         it "should return third lexem when called thrice" do
           2.times{ subject.next }
           subject.next == "inputsimulating"
+        end
+      end
+
+      describe ".latest()" do
+        it "returns nil if called before lexing starts" do
+          subject.latest.should == nil
         end
       end
 

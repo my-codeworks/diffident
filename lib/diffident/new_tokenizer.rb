@@ -1,7 +1,9 @@
 module Diffident
   class NewTokenizer
 
-    require 'diffident/lexer'
+    attr_accessor :this_row
+
+    require 'diffident/tokenizer/file_lexer'
     require 'diffident/tokenizer/common_sequence'
 
     Change = Struct.new :action, :base_row, :this_row, :text
@@ -9,38 +11,28 @@ module Diffident
     def initialize( base_file_name, this_file_name )
       @base_file_name = base_file_name
       @this_file_name = this_file_name
-      @tail_lexems = []
-      @base_row = 0
-      @this_row = 0
+      @tail_length = 0
     end
 
     def process
-
-      @base_file = File.open( @base_file_name )
-      @this_file = File.open( @this_file_name )
+      @base_file = Diffident::Tokenizer::FileLexer.new( @base_file_name )
+      @this_file = Diffident::Tokenizer::FileLexer.new( @this_file_name )
 
       reduce_problem_size_by_skipping_leading_lexems_that_are_unchanged
-
-      load_remaining_lexems_into_memory
-
       reduce_problem_size_by_skipping_trailing_lexems_that_are_unchanged
 
-      base_lexems.compact!
-      this_lexems.compact!
-
-      if this_lexems.compact.any? and base_lexems.compact.any?
-
-        css = Diffident::Tokenizer::CommonSequence.find( base_lexems.compact, this_lexems.compact )
-
-        add_base_lexems_not_in_complete_common_subsequence_as_deletions(css)
+      if ( base_lexems = [ @base_file.lexems[@base_file.row() -1 .. -@tail_length] ].flatten ).any? and
+         ( this_lexems = [ @this_file.lexems[@this_file.row() -1 .. -@tail_length] ].flatten ).any?
+        complete_common_sequence = Diffident::Tokenizer::CommonSequence.find( base_lexems, this_lexems )
+        process_complete_common_sequence( complete_common_sequence )
       end
 
       add_remaining_base_lexems_as_deletions
       add_remaining_this_lexems_as_additions
       add_remaining_tail_lexems_as_same
 
-      @base_file.close
-      @this_file.close
+      @base_file.finish
+      @this_file.finish
 
       return diff
     end
@@ -48,100 +40,74 @@ module Diffident
   private
 
     def reduce_problem_size_by_skipping_leading_lexems_that_are_unchanged
-      begin
-        base_lexem = base_lexer.next
-        this_lexem = this_lexer.next
-
-        diff << Change.new(:same, @base_row += 1, @this_row += 1, base_lexem) if base_lexem == this_lexem
-        
-      end while base_lexem == this_lexem and base_lexer.has_more_lexems? and this_lexer.has_more_lexems?
-    end
-
-    def load_remaining_lexems_into_memory
-      if base_lexer.has_more_lexems?
-        base_lexems[@base_row += 1] = base_lexer.latest
-        base_lexems[@base_row += 1] = base_lexer.next while base_lexer.has_more_lexems?
+      while @base_file.next_lexem == @this_file.next_lexem and not @base_file.current_lexem.nil?
+        diff << Change.new(:same, @base_file.row, @this_file.row, @base_file.current_lexem)
       end
-      if this_lexer.has_more_lexems?
-        this_lexems[@this_row += 1] = this_lexer.latest
-        this_lexems[@this_row += 1] = this_lexer.next while this_lexer.has_more_lexems?
-      end
-      @base_row -= base_lexems.compact.length
-      @this_row -= this_lexems.compact.length
     end
 
     def reduce_problem_size_by_skipping_trailing_lexems_that_are_unchanged
-      if base_lexems.any? and this_lexems.any?
-        tail_length = 0
-        tail_length += 1 while base_lexems[-(tail_length+1)] == this_lexems[-(tail_length+1)]
-        
-        @tail_lexems = base_lexems.pop(tail_length)
-        this_lexems.pop(tail_length)
-      end
+      max_tail_length = [
+                          @base_file.lexems.length - @base_file.row,
+                          @this_file.lexems.length - @this_file.row
+                        ].min
+
+      @tail_length += 1 while @base_file.lexems[-@tail_length] and
+                              @base_file.lexems[-@tail_length] == @this_file.lexems[-@tail_length] and
+                              @tail_length <= max_tail_length
     end
 
     def add_remaining_this_lexems_as_additions
-      this_lexems.each do |lexem|
-        diff << Change.new(:addition, -1, @this_row += 1, lexem) unless lexem.nil?
+      last_row_of_interest = @this_file.lexems.length - @tail_length + 1
+      while @this_file.row <= last_row_of_interest and @this_file.current_lexem
+        diff << Change.new(:addition, -1, @this_file.row, @this_file.current_lexem)
+        @this_file.next_lexem
       end
     end
 
     def add_remaining_base_lexems_as_deletions
-      base_lexems.each do |lexem|
-        diff << Change.new(:deletion, @base_row += 1, -1, lexem) unless lexem.nil?
+      last_row_of_interest = @base_file.lexems.length - @tail_length + 1
+      while @base_file.row <= last_row_of_interest and @base_file.current_lexem
+        diff << Change.new(:deletion, @base_file.row, -1, @base_file.current_lexem)
+        @base_file.next_lexem
       end
     end
 
     def add_remaining_tail_lexems_as_same
-      @tail_lexems.each do |d|
-        @base_row += 1
-        @this_row += 1
-        diff << Change.new(:same, @base_row, @this_row, d)
+      while @base_file.current_lexem and @base_file.current_lexem
+        diff << Change.new(:same, @base_file.row, @this_file.row, @base_file.current_lexem)
+        @base_file.next_lexem
+        @this_file.next_lexem
       end
     end
 
-    def add_base_lexems_not_in_complete_common_subsequence_as_deletions( css )
+    def process_complete_common_sequence( css )
       css.each_with_index do |line, row|
         unless line.nil?
-          add_base_lexems_up_to_this_line_as_deletions(line)
-          add_this_lexems_up_to_this_line_as_additions(line)
-          base_lexems.shift
-          this_lexems.shift
-          diff << Change.new(:same, @base_row += 1, @this_row += 1, line)
+          add_base_lexems_up_to_this_line_as_deletions( line )
+          add_this_lexems_up_to_this_line_as_additions( line )
+          diff << Change.new(:same, @base_file.row, @this_file.row, line)
+          @base_file.next_lexem
+          @this_file.next_lexem
         end
       end
     end
 
     def add_base_lexems_up_to_this_line_as_deletions( line )
-      while base_lexems.compact.first != line do
-        diff << Change.new(:deletion, @base_row += 1, -1, base_lexems.shift)
+      while @base_file.current_lexem != line do
+        diff << Change.new(:deletion, @base_file.row, -1, @base_file.current_lexem)
+        @base_file.next_lexem
       end
     end
 
     def add_this_lexems_up_to_this_line_as_additions( line )
-      while this_lexems.compact.first != line do
-        diff << Change.new(:addition, -1, @this_row += 1, this_lexems.shift)
+      while @this_file.current_lexem != line do
+        diff << Change.new(:addition, -1, @this_file.row, @this_file.current_lexem)
+        @this_file.next_lexem
       end
-    end
-
-    def base_lexems
-      @base_lexems ||= []
-    end
-
-     def this_lexems
-      @this_lexems ||= []
     end
 
     def diff
       @diff ||= []
-    end
-
-    def base_lexer
-      @base_lexer ||= Lexer.new( input: @base_file.each )
-    end
-
-    def this_lexer
-      @this_lexer ||= Lexer.new( input: @this_file.each )
     end
     
   end

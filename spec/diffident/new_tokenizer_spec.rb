@@ -8,9 +8,10 @@ def diff_print( diff )
 end
 
 describe Diffident::NewTokenizer do
-  it "produces output" do
+  it "produces output", focus: true do
     t = Diffident::NewTokenizer.new( 'spec/support/files/changed/base.css', 'spec/support/files/changed/this.css' )
     diff = t.process
+    # diff_print(diff)
   end
 
   context "no differances between files" do
